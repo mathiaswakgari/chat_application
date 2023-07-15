@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-TextStyle appStyle(
+TextStyle customTextStyle(
     double fontSize,
     Color fontColor,
     FontWeight fontWeight
