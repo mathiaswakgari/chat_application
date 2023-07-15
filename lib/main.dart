@@ -1,6 +1,7 @@
 import 'package:chat_application/helper/functions.dart';
 import 'package:chat_application/screens/home_screen.dart';
 import 'package:chat_application/screens/login_screen.dart';
+import 'package:chat_application/screens/signup_screen.dart';
 import 'package:chat_application/shared/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: _isLoggedIn ?  const HomeScreen() : const LoginScreen()
+      home: _isLoggedIn ?  const HomeScreen() : const SignupScreen()
     );
   }
 }
