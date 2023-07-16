@@ -165,7 +165,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
         }
         else{
-          showSnackBar(context, const Color(0xFFE77200), value);
+          showSnackBar(context, Constants.secondaryColor, value);
           setState(() {
             _isRegistering = false;
           });

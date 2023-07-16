@@ -7,6 +7,7 @@ class Constants{
   static String messagingSenderId = "321080410087";
   static String projectId = "chat-application-5b742";
   static Color mainColor = const Color(0xFF51B7A6);
+  static Color secondaryColor = const Color(0xFFE77200);
 
 
 }
