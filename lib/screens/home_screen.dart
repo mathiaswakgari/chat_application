@@ -1,3 +1,5 @@
+import 'package:chat_application/helper/functions.dart';
+import 'package:chat_application/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +15,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home"),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => AuthService().signOut(),
+          child: const Text("Log out"),
+        ),
       ),
     );
   }

@@ -18,5 +18,11 @@ class DatabaseService{
        "uid": uid
      });
    }
+   
+   Future getUser()async{
+     QuerySnapshot querySnapshot = await userCollection.where(
+         "uid", isEqualTo: uid).get();
+     return querySnapshot;
+   }
 
 }

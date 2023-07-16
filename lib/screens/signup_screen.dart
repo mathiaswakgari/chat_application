@@ -1,3 +1,7 @@
+import 'package:chat_application/helper/functions.dart';
+import 'package:chat_application/screens/home_screen.dart';
+import 'package:chat_application/services/auth_service.dart';
+import 'package:chat_application/widgets/snackBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +19,8 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
 
+  bool _isRegistering = false;
+  AuthService _authService = AuthService();
   TextEditingController fullNameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
@@ -24,7 +30,10 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SingleChildScrollView(
+      body: _isRegistering? Center(
+        child: CircularProgressIndicator(
+            color: Constants.mainColor),
+      ):SingleChildScrollView(
         child: Column(
           children: [
             Container(
@@ -99,7 +108,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: 35,
-                      child: CustomButton(
+                      child:CustomButton(
                         onPressed: register,
                         label: 'Register',
                       ),
@@ -109,17 +118,17 @@ class _SignupScreenState extends State<SignupScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Don't have an account yet?",
+                          "Already have an account?",
                           style: customTextStyle(12, Colors.black, FontWeight.normal),
                         ),
                         TextButton(
                             onPressed: (){
                             },
                             style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 2)
+                                padding: const EdgeInsets.symmetric(horizontal: 0)
                             ),
                             child: Text(
-                              "Register here",
+                              "Sign in",
                               style: customTextStyle(12, Constants.mainColor, FontWeight.normal),
                             )
                         )
@@ -137,7 +146,31 @@ class _SignupScreenState extends State<SignupScreen> {
 
   register() async{
     if(_formKey.currentState!.validate()){
+      setState(() {
+        _isRegistering = true;
+      });
+      await AuthService().register(
+          fullNameTextEditingController.text,
+          emailTextEditingController.text,
+          passwordTextEditingController.text
+      ).then((value)async {
+        if(value == true){
 
+          await HelperFunctions.saveUserLoggingStatus(true);
+          await HelperFunctions.saveUserEmail(emailTextEditingController.text);
+          await HelperFunctions.saveUserName(fullNameTextEditingController.text);
+
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context)=> const HomeScreen()));
+
+        }
+        else{
+          showSnackBar(context, const Color(0xFFE77200), value);
+          setState(() {
+            _isRegistering = false;
+          });
+        }
+      });
     }
   }
 

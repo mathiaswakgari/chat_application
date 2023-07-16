@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: _isLoggedIn ?  const HomeScreen() : const SignupScreen()
+      home: _isLoggedIn ?  const HomeScreen() : const LoginScreen()
     );
   }
 }

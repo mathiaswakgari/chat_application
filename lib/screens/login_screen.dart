@@ -1,10 +1,18 @@
+import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customButton.dart';
 import 'package:chat_application/widgets/customSpacing.dart';
 import 'package:chat_application/widgets/customStyle.dart';
 import 'package:chat_application/widgets/customTextField.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../helper/functions.dart';
+import '../services/auth_service.dart';
+import '../widgets/snackBar.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,6 +23,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
 
+  bool _isLogging = false;
+
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -23,7 +33,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: SingleChildScrollView(
+      body: _isLogging ? Center(
+        child: CircularProgressIndicator(color: Constants.mainColor,),
+      ): SingleChildScrollView(
         child: Column(
           children: [
             Container(
@@ -84,9 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: MediaQuery.of(context).size.width,
                           height: 35,
                           child: CustomButton(
-                              onPressed: (){
-                                if(_formKey.currentState!.validate()){}
-                              },
+                              onPressed: login,
                               label: 'Sign in',
                           ),
                         ),
@@ -119,5 +129,36 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+  login() async {
+    if(_formKey.currentState!.validate()){
+      setState(() {
+        _isLogging = true;
+      });
+      await AuthService().signIn(
+          emailTextEditingController.text,
+          passwordTextEditingController.text
+      ).then((value)async {
+        if(value == true){
+
+          QuerySnapshot querySnapshot = await DatabaseService(
+              uid: FirebaseAuth.instance.currentUser!.uid).getUser();
+
+          await HelperFunctions.saveUserLoggingStatus(true);
+          await HelperFunctions.saveUserEmail(emailTextEditingController.text);
+          await HelperFunctions.saveUserName(querySnapshot.docs[0]['fullName']);
+
+          Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context)=> const HomeScreen()));
+
+        }
+        else{
+          showSnackBar(context, const Color(0xFFE77200), value);
+          setState(() {
+            _isLogging = false;
+          });
+        }
+      });
+    }
   }
 }

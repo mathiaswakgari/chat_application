@@ -24,9 +24,19 @@ class CustomTextField extends StatelessWidget {
         if(isPassword){
           if (value!.length < 8) {
             return "Password must be at least 8 characters";
-          } else {
+          }
+          else {
             return null;
           }
+        }
+        else if(label == "Full Name"){
+          if(value!.isEmpty){
+            return "Full name can't be empty";
+          }
+          else{
+            return null;
+          }
+
         }
         else{
           return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
