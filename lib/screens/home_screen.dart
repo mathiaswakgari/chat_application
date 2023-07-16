@@ -18,18 +18,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String? fullName;
-  String? email;
+  String fullName = "";
+  String email = "";
 
   getUserData() async {
     await HelperFunctions.getUserEmailSharedPreferences().then((value) {
       setState(() {
-        email = value;
+        email = value!;
       });
     });
     await HelperFunctions.getUserNameSharedPreferences().then((value) {
       setState(() {
-        fullName = value;
+        fullName = value!;
       });
     });
   }

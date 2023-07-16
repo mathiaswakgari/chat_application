@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DatabaseService{
 
@@ -23,6 +24,20 @@ class DatabaseService{
      QuerySnapshot querySnapshot = await userCollection.where(
          "uid", isEqualTo: uid).get();
      return querySnapshot;
+   }
+
+   Future updateUser(String fullName, String password)async{
+     try{
+       print(uid);
+       await userCollection.doc(uid).update({
+         "fullName": fullName,
+       });
+       await FirebaseAuth.instance.currentUser!.updatePassword(password);
+       return true;
+     }
+     on FirebaseAuthException catch(error){
+       return error.message;
+     }
    }
 
 }
