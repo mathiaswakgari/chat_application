@@ -100,10 +100,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       width: MediaQuery.of(context).size.width,
                       height: 35,
                       child: CustomButton(
-                        onPressed: (){
-                          if(_formKey.currentState!.validate()){}
-                        },
-                        label: 'Sign in',
+                        onPressed: register,
+                        label: 'Register',
                       ),
                     ),
                     const CustomSpacing(),
@@ -134,6 +132,13 @@ class _SignupScreenState extends State<SignupScreen> {
           ],
         ),
       ),
-    );;
+    );
   }
+
+  register() async{
+    if(_formKey.currentState!.validate()){
+
+    }
+  }
+
 }
