@@ -1,6 +1,7 @@
 import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customStyle.dart';
+import 'package:chat_application/widgets/searchTile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -75,42 +76,43 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
           _isLoading
-              ?  Center(
+              ? Center(
                   child: CircularProgressIndicator(
                     color: Constants.mainColor,
                   ),
                 )
-              : usersList()
+              : Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: usersList(),
+                )
         ],
       ),
     );
   }
 
   search() async {
-    if(searchController.text.isNotEmpty){
-      await DatabaseService().searchUsers(searchController.text).then(
-              (snapshot){
-            setState(() {
-              querySnapshot = snapshot;
-              _hasSearched = true;
-              _isLoading = false;
-            });
-          }
-      );
+    if (searchController.text.isNotEmpty) {
+      await DatabaseService()
+          .searchUsers(searchController.text)
+          .then((snapshot) {
+        setState(() {
+          querySnapshot = snapshot;
+          _hasSearched = true;
+          _isLoading = false;
+        });
+      });
     }
   }
 
-  usersList(){
-    return _hasSearched ? ListView.builder(
-        shrinkWrap: true,
-        itemCount: querySnapshot!.docs.length,
-        itemBuilder: (context, index){
-      return Container(
-        padding: const EdgeInsets.all(8),
-        height: 20,
-        width: 20,
-        color: Colors.black,
-      );
-    }) : Container();
+  usersList() {
+    return _hasSearched
+        ? ListView.builder(
+            shrinkWrap: true,
+            itemCount: querySnapshot!.docs.length,
+            itemBuilder: (context, index) {
+              return SearchTile(
+                  userName: querySnapshot!.docs[index].get('fullName'));
+            })
+        : Container();
   }
 }
