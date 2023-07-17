@@ -1,10 +1,13 @@
 import 'package:chat_application/helper/functions.dart';
 import 'package:chat_application/screens/profile_screen.dart';
 import 'package:chat_application/services/auth_service.dart';
+import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customDrawer.dart';
 import 'package:chat_application/widgets/customSpacing.dart';
 import 'package:chat_application/widgets/customStyle.dart';
+import 'package:chat_application/widgets/snackBar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -20,6 +23,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String fullName = "";
   String email = "";
+  Stream? chats;
 
   getUserData() async {
     await HelperFunctions.getUserEmailSharedPreferences().then((value) {
@@ -30,6 +34,13 @@ class _HomeScreenState extends State<HomeScreen> {
     await HelperFunctions.getUserNameSharedPreferences().then((value) {
       setState(() {
         fullName = value!;
+      });
+    });
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUserChats()
+        .then((snapshot) {
+      setState(() {
+        chats = snapshot;
       });
     });
   }
@@ -44,24 +55,82 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 12.0),
-              child: GestureDetector(
-                onTap: () {},
-                child: const Icon(CupertinoIcons.search),
-              ),
-            )
-          ],
-          title: Text(
-            "Messages",
-            style: customTextStyle(20, Colors.white, FontWeight.normal),
-          ),
-          centerTitle: true,
-          backgroundColor: Constants.mainColor,
+      appBar: AppBar(
+        elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: GestureDetector(
+              onTap: () {},
+              child: const Icon(CupertinoIcons.search),
+            ),
+          )
+        ],
+        title: Text(
+          "Messages",
+          style: customTextStyle(20, Colors.white, FontWeight.normal),
         ),
-        drawer: CustomDrawer(fullName: fullName!, email: email!, index: 1));
+        centerTitle: true,
+        backgroundColor: Constants.mainColor,
+      ),
+      drawer: CustomDrawer(fullName: fullName!, email: email!, index: 1),
+      body: chatList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Constants.mainColor,
+        elevation: 0,
+        child: const Icon(
+          CupertinoIcons.chat_bubble_fill,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  chatList() {
+    return StreamBuilder(
+        stream: chats,
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.hasError) {
+            showSnackBar(
+                context, Constants.secondaryColor, snapshot.error.toString());
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Constants.mainColor,
+              ),
+            );
+          } else if (snapshot.hasData) {
+            if (snapshot.data['privateChats'] != null) {
+              if (snapshot.data['privateChats'].length != 0) {
+
+                // show actual data
+                return const Text("Hello");
+              } else {
+                // return no private chats
+                return Center(
+                  child: Text(
+                    "You have no chats.",
+                    style: customTextStyle(20, Colors.black, FontWeight.normal),
+                  ),
+                );
+              }
+            } else {
+              // return no private chats
+              return Center(
+                child: Text(
+                  "You have no chats.",
+                  style: customTextStyle(20, Colors.black, FontWeight.normal),
+                ),
+              );
+            }
+          }
+          return Center(
+            child: Text(
+              "You have no chats.",
+              style: customTextStyle(20, Colors.black, FontWeight.normal),
+            ),
+          );
+        });
   }
 }

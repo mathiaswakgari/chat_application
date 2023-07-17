@@ -40,4 +40,29 @@ class DatabaseService{
      }
    }
 
+   getUserChats()async{
+     return userCollection.doc(uid).snapshots();
+   }
+
+   Future createChat(String peerOneId, String peerTwoId)async{
+     DocumentReference chatDocumentReference = await p2pCollection.add({
+       "members": [],
+       "recentMessage": "",
+       "chatId": "",
+       "recentMessageSender": "",
+       "messages": []
+     });
+
+     await chatDocumentReference.update({
+       "chatId": chatDocumentReference.id,
+       "members": FieldValue.arrayUnion([peerOneId, peerTwoId])
+     });
+
+     DocumentReference userDocumentReference = userCollection.doc(uid);
+     
+     return await userDocumentReference.update({
+       "privateChats": FieldValue.arrayUnion([chatDocumentReference.id])
+     });
+   }
+
 }

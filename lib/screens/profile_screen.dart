@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .updateUser(fullNameController.text, passwordController.text).then((value){
             if(value == true){
               showSnackBar(context, Constants.mainColor, "Update successful.");
-
+              // update sharedPreference
               Navigator.pop(context);
             }
             else{
