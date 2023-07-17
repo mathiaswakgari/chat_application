@@ -1,8 +1,10 @@
 import 'package:chat_application/helper/functions.dart';
 import 'package:chat_application/screens/profile_screen.dart';
+import 'package:chat_application/screens/search_screen.dart';
 import 'package:chat_application/services/auth_service.dart';
 import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/shared/constants.dart';
+import 'package:chat_application/widgets/chatTile.dart';
 import 'package:chat_application/widgets/customDrawer.dart';
 import 'package:chat_application/widgets/customSpacing.dart';
 import 'package:chat_application/widgets/customStyle.dart';
@@ -61,7 +63,11 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context)=> const SearchScreen())
+                );
+              },
               child: const Icon(CupertinoIcons.search),
             ),
           )
@@ -103,9 +109,12 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (snapshot.hasData) {
             if (snapshot.data['privateChats'] != null) {
               if (snapshot.data['privateChats'].length != 0) {
-
                 // show actual data
-                return const Text("Hello");
+                return ListView.builder(
+                    itemCount: snapshot.data['privateChats'].length,
+                    itemBuilder: (context, index) {
+                      return  ;
+                    });
               } else {
                 // return no private chats
                 return Center(
