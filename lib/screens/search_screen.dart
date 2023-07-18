@@ -22,6 +22,12 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _hasChatAlready = false;
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    searchController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

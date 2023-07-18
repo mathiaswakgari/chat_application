@@ -1,4 +1,6 @@
+import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/widgets/customButton.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +32,11 @@ class SearchTile extends StatelessWidget {
         userName,
         style: customTextStyle(15, Colors.black, FontWeight.normal),
       ),
-      trailing: CustomButton(onPressed: (){}, label: label),
+      trailing: CustomButton(onPressed: ()async{
+
+        await DatabaseService().createChat(FirebaseAuth.instance.currentUser!.uid, uid);
+
+      }, label: label),
     ) ;
 
 

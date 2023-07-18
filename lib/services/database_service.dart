@@ -40,26 +40,63 @@ class DatabaseService {
   }
 
   Future createChat(String peerOneId, String peerTwoId) async {
-    DocumentReference chatDocumentReference = await p2pCollection.add({
-      "members": [],
-      "recentMessage": "",
-      "chatId": "",
-      "recentMessageSender": "",
-      "messages": [],
-      "lastUpdated": ""
-    });
+    List<dynamic> chatIds = [];
+    bool? peerToPeerAlready;
 
-    await chatDocumentReference.update({
-      "chatId": chatDocumentReference.id,
-      "members": FieldValue.arrayUnion([peerOneId, peerTwoId]),
-      "lastUpdated": Timestamp.now().toString()
-    });
+    DocumentReference peerOneDocumentReference = userCollection.doc(peerOneId);
+    DocumentReference peerTwoDocumentReference = userCollection.doc(peerTwoId);
+    // DocumentReference chatDocumentReference = p2pCollection.;
 
-    DocumentReference userDocumentReference = userCollection.doc(uid);
+    DocumentSnapshot peerOneSnapshot = await peerOneDocumentReference.get();
+    DocumentSnapshot peerTwoSnapshot = await peerTwoDocumentReference.get();
+    // DocumentSnapshot chatDocumentSnapshot = await ;
 
-    return await userDocumentReference.update({
-      "privateChats": FieldValue.arrayUnion([chatDocumentReference.id])
-    });
+    List peerOneChats = peerOneSnapshot['privateChats'];
+    List peerTwoChats = peerTwoSnapshot['privateChats'];
+
+    QuerySnapshot querySnapshot = await p2pCollection.get();
+
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    for (int i = 0; i < allData.length; i++) {
+      chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
+    }
+
+    for (int i = 0; i < peerTwoChats.length; i++) {
+      if (peerOneChats.contains(peerTwoChats[i])) {
+        peerToPeerAlready = true;
+        break;
+      }
+    }
+
+    if (peerToPeerAlready! == false) {
+      DocumentReference chatDocumentReference = await p2pCollection.add({
+        "members": [],
+        "recentMessage": "",
+        "chatId": "",
+        "recentMessageSender": "",
+        "messages": [],
+        "lastUpdated": ""
+      });
+
+      await chatDocumentReference.update({
+        "chatId": chatDocumentReference.id,
+        "members": FieldValue.arrayUnion([peerOneId, peerTwoId]),
+        "lastUpdated": Timestamp.now().toString()
+      });
+
+      await peerOneDocumentReference.update({
+        "privateChats": FieldValue.arrayUnion([chatDocumentReference.id])
+      });
+      await peerTwoDocumentReference.update({
+        "privateChats": FieldValue.arrayUnion([chatDocumentReference.id])
+      });
+
+      DocumentSnapshot chatDocumentSnapshot = await chatDocumentReference.get();
+      return chatDocumentSnapshot;
+    } else {
+      return false;
+    }
   }
 
   Future getChat(String chatId) async {
@@ -70,22 +107,19 @@ class DatabaseService {
         .snapshots();
   }
 
-  searchUsers(String name)async{
+  searchUsers(String name) async {
     return userCollection.where("fullName", isLessThanOrEqualTo: name).get();
   }
 
-  Future<bool> isChatStarted(String userId)async{
+  Future<bool> isChatStarted(String userId) async {
     DocumentReference userDocumentReference = userCollection.doc(uid);
     DocumentSnapshot userDocumentSnapshot = await userDocumentReference.get();
 
     List<dynamic> chats = await userDocumentSnapshot['privateChats'];
-    if(chats.contains(userId)){
+    if (chats.contains(userId)) {
       return true;
-    }
-    else{
+    } else {
       return false;
     }
-
   }
-
 }
