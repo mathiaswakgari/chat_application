@@ -3,6 +3,7 @@ import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customStyle.dart';
 import 'package:chat_application/widgets/searchTile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _isLoading = false;
   QuerySnapshot? querySnapshot;
   bool _hasSearched = false;
+  bool _hasChatAlready = false;
 
   @override
   Widget build(BuildContext context) {
@@ -104,14 +106,27 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  hasStartedChatAlready(String chatId, String userId) async {
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .isChatStarted(userId)
+        .then((value) {
+      setState(() {
+        _hasChatAlready = value;
+      });
+    });
+  }
+
   usersList() {
     return _hasSearched
         ? ListView.builder(
             shrinkWrap: true,
             itemCount: querySnapshot!.docs.length,
             itemBuilder: (context, index) {
+              hasStartedChatAlready('chatId', 'userId');
               return SearchTile(
-                  userName: querySnapshot!.docs[index].get('fullName'));
+                  userName: querySnapshot!.docs[index].get('fullName'),
+                  uid : querySnapshot!.docs[index].get('uid'),
+              label: _hasChatAlready ? 'Send': 'Start',);
             })
         : Container();
   }

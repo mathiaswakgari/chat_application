@@ -74,4 +74,18 @@ class DatabaseService {
     return userCollection.where("fullName", isLessThanOrEqualTo: name).get();
   }
 
+  Future<bool> isChatStarted(String userId)async{
+    DocumentReference userDocumentReference = userCollection.doc(uid);
+    DocumentSnapshot userDocumentSnapshot = await userDocumentReference.get();
+
+    List<dynamic> chats = await userDocumentSnapshot['privateChats'];
+    if(chats.contains(userId)){
+      return true;
+    }
+    else{
+      return false;
+    }
+
+  }
+
 }
