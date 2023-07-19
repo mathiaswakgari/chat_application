@@ -158,10 +158,9 @@ class DatabaseService {
 
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
 
-    if (peerOneChats.isEmpty){
+    if (peerOneChats.isEmpty) {
       return false;
-    }
-    else{
+    } else {
       for (int i = 0; i < allData.length; i++) {
         chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
       }
@@ -177,5 +176,14 @@ class DatabaseService {
         return false;
       }
     }
-    }
+  }
+
+  sendMessage(String chatId, Map<String, dynamic> message) async {
+    p2pCollection.doc(chatId).collection('messages').add(message);
+    p2pCollection.doc(chatId).update({
+      "recentMessage": message['message'],
+      "recentMessageSender": message['sender'],
+    });
+
+  }
 }

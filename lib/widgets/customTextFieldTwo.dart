@@ -37,7 +37,6 @@ class CustomTextFieldTwo extends StatelessWidget {
           else{
             return null;
           }
-
         }
         else{
           return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")

@@ -62,8 +62,8 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: _isLoggedIn ?  const HomeScreen() : const LoginScreen(),
-      // home: ChatScreen(),
+      // home: _isLoggedIn ?  const HomeScreen() : const LoginScreen(),
+      home: ChatScreen(userName: '', uid: '', chatId: '',),
     );
   }
 }
