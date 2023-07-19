@@ -23,6 +23,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void dispose() {
+    super.dispose();
     // TODO: implement dispose
     searchController.dispose();
   }
@@ -112,7 +113,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  hasStartedChatAlready(String chatId, String userId) async {
+  /*hasStartedChatAlready(String chatId, String userId) async {
     await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
         .isChatStarted(userId)
         .then((value) {
@@ -120,7 +121,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _hasChatAlready = value;
       });
     });
-  }
+  }*/
 
   usersList() {
     return _hasSearched
@@ -128,11 +129,10 @@ class _SearchScreenState extends State<SearchScreen> {
             shrinkWrap: true,
             itemCount: querySnapshot!.docs.length,
             itemBuilder: (context, index) {
-              hasStartedChatAlready('chatId', 'userId');
               return SearchTile(
                   userName: querySnapshot!.docs[index].get('fullName'),
                   uid : querySnapshot!.docs[index].get('uid'),
-              label: _hasChatAlready ? 'Send': 'Start',);
+             );
             })
         : Container();
   }

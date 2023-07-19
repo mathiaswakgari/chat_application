@@ -58,6 +58,10 @@ class DatabaseService {
 
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
 
+    if(peerOneChats.isEmpty){
+      print("Empoty");
+    }
+
     for (int i = 0; i < allData.length; i++) {
       chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
     }
@@ -67,9 +71,12 @@ class DatabaseService {
         peerToPeerAlready = true;
         break;
       }
+      else{
+        peerToPeerAlready = false;
+      }
     }
 
-    if (peerToPeerAlready! == false) {
+    if (peerToPeerAlready == false) {
       DocumentReference chatDocumentReference = await p2pCollection.add({
         "members": [],
         "recentMessage": "",
@@ -93,7 +100,7 @@ class DatabaseService {
       });
 
       DocumentSnapshot chatDocumentSnapshot = await chatDocumentReference.get();
-      return chatDocumentSnapshot;
+      return true;
     } else {
       return false;
     }
@@ -111,14 +118,38 @@ class DatabaseService {
     return userCollection.where("fullName", isLessThanOrEqualTo: name).get();
   }
 
-  Future<bool> isChatStarted(String userId) async {
-    DocumentReference userDocumentReference = userCollection.doc(uid);
-    DocumentSnapshot userDocumentSnapshot = await userDocumentReference.get();
+  Future<bool> isChatStarted(String peerOneId, String peerTwoId) async {
+    List<dynamic> chatIds = [];
+    bool? peerToPeerAlready;
 
-    List<dynamic> chats = await userDocumentSnapshot['privateChats'];
-    if (chats.contains(userId)) {
+    DocumentReference peerOneDocumentReference = userCollection.doc(peerOneId);
+    DocumentReference peerTwoDocumentReference = userCollection.doc(peerTwoId);
+    // DocumentReference chatDocumentReference = p2pCollection.;
+
+    DocumentSnapshot peerOneSnapshot = await peerOneDocumentReference.get();
+    DocumentSnapshot peerTwoSnapshot = await peerTwoDocumentReference.get();
+    // DocumentSnapshot chatDocumentSnapshot = await ;
+
+    List peerOneChats = peerOneSnapshot['privateChats'];
+    List peerTwoChats = peerTwoSnapshot['privateChats'];
+
+    QuerySnapshot querySnapshot = await p2pCollection.get();
+
+    final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
+
+    for (int i = 0; i < allData.length; i++) {
+      chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
+    }
+    for (int i = 0; i < peerTwoChats.length; i++) {
+      if (peerOneChats.contains(peerTwoChats[i])) {
+        peerToPeerAlready = true;
+        break;
+      }
+    }
+    if(peerToPeerAlready == true){
       return true;
-    } else {
+    }
+    else{
       return false;
     }
   }
