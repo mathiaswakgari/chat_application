@@ -58,25 +58,7 @@ class DatabaseService {
 
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
 
-    if(peerOneChats.isEmpty){
-      print("Empoty");
-    }
-
-    for (int i = 0; i < allData.length; i++) {
-      chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
-    }
-
-    for (int i = 0; i < peerTwoChats.length; i++) {
-      if (peerOneChats.contains(peerTwoChats[i])) {
-        peerToPeerAlready = true;
-        break;
-      }
-      else{
-        peerToPeerAlready = false;
-      }
-    }
-
-    if (peerToPeerAlready == false) {
+    if (peerOneChats.isEmpty) {
       DocumentReference chatDocumentReference = await p2pCollection.add({
         "members": [],
         "recentMessage": "",
@@ -102,7 +84,46 @@ class DatabaseService {
       DocumentSnapshot chatDocumentSnapshot = await chatDocumentReference.get();
       return true;
     } else {
-      return false;
+      for (int i = 0; i < allData.length; i++) {
+        chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
+      }
+      for (int i = 0; i < peerTwoChats.length; i++) {
+        if (peerOneChats.contains(peerTwoChats[i])) {
+          peerToPeerAlready = true;
+          break;
+        } else {
+          peerToPeerAlready = false;
+        }
+      }
+      if (peerToPeerAlready == false) {
+        DocumentReference chatDocumentReference = await p2pCollection.add({
+          "members": [],
+          "recentMessage": "",
+          "chatId": "",
+          "recentMessageSender": "",
+          "messages": [],
+          "lastUpdated": ""
+        });
+
+        await chatDocumentReference.update({
+          "chatId": chatDocumentReference.id,
+          "members": FieldValue.arrayUnion([peerOneId, peerTwoId]),
+          "lastUpdated": Timestamp.now().toString()
+        });
+
+        await peerOneDocumentReference.update({
+          "privateChats": FieldValue.arrayUnion([chatDocumentReference.id])
+        });
+        await peerTwoDocumentReference.update({
+          "privateChats": FieldValue.arrayUnion([chatDocumentReference.id])
+        });
+
+        DocumentSnapshot chatDocumentSnapshot =
+            await chatDocumentReference.get();
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
@@ -137,20 +158,24 @@ class DatabaseService {
 
     final allData = querySnapshot.docs.map((doc) => doc.data()).toList();
 
-    for (int i = 0; i < allData.length; i++) {
-      chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
-    }
-    for (int i = 0; i < peerTwoChats.length; i++) {
-      if (peerOneChats.contains(peerTwoChats[i])) {
-        peerToPeerAlready = true;
-        break;
-      }
-    }
-    if(peerToPeerAlready == true){
-      return true;
-    }
-    else{
+    if (peerOneChats.isEmpty){
       return false;
     }
-  }
+    else{
+      for (int i = 0; i < allData.length; i++) {
+        chatIds.add((allData[i] as Map<dynamic, dynamic>)['chatId']);
+      }
+      for (int i = 0; i < peerTwoChats.length; i++) {
+        if (peerOneChats.contains(peerTwoChats[i])) {
+          peerToPeerAlready = true;
+          break;
+        }
+      }
+      if (peerToPeerAlready == true) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    }
 }
