@@ -1,6 +1,7 @@
 import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/widgets/customButton.dart';
 import 'package:chat_application/widgets/snackBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class SearchTile extends StatefulWidget {
   final String userName;
   final String uid;
 
+
   const SearchTile({Key? key, required this.userName, required this.uid})
       : super(key: key);
 
@@ -20,13 +22,23 @@ class SearchTile extends StatefulWidget {
 }
 
 class _SearchTileState extends State<SearchTile> {
-  bool _isChatAvailaible = false;
+  bool _isChatAvailable = false;
+  QuerySnapshot? userInfo;
+
+  getUserInfo()async{
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid).getUser().then((value){
+      setState(() {
+        userInfo = value;
+      });
+    });
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     isChatAvailable();
+    getUserInfo();
   }
 
   @override
@@ -47,18 +59,18 @@ class _SearchTileState extends State<SearchTile> {
       ),
       trailing: CustomButton(
           onPressed: () async {
-            if (_isChatAvailaible) {
+            if (_isChatAvailable) {
               showSnackBar(context, Constants.secondaryColor,
                   "Chat is Already Available");
             } else {
               await DatabaseService().createChat(
-                  FirebaseAuth.instance.currentUser!.uid, widget.uid);
+                  FirebaseAuth.instance.currentUser!.uid, widget.uid, userInfo?.docs[0]['fullName'],widget.userName);
               setState(() {});
               showSnackBar(context, Constants.mainColor,
                   "Chat created succesfully");
             }
           },
-          label: _isChatAvailaible ? "Send" : "Start"),
+          label: _isChatAvailable ? "Send" : "Start"),
     );
   }
 
@@ -67,7 +79,7 @@ class _SearchTileState extends State<SearchTile> {
         .isChatStarted(FirebaseAuth.instance.currentUser!.uid, widget.uid)
         .then((value) {
       setState(() {
-        _isChatAvailaible = value;
+        _isChatAvailable = value;
       });
     });
   }

@@ -9,6 +9,7 @@ import 'package:chat_application/widgets/customDrawer.dart';
 import 'package:chat_application/widgets/customSpacing.dart';
 import 'package:chat_application/widgets/customStyle.dart';
 import 'package:chat_application/widgets/snackBar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String fullName = "";
   String email = "";
-  Stream? chats;
+  Stream? privateChats;
+  QuerySnapshot? userInfo;
 
   getUserData() async {
     await HelperFunctions.getUserEmailSharedPreferences().then((value) {
@@ -42,7 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
         .getUserChats()
         .then((snapshot) {
       setState(() {
-        chats = snapshot;
+        privateChats = snapshot;
+      });
+    });
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUser()
+        .then((value) {
+      setState(() {
+        userInfo = value;
       });
     });
   }
@@ -94,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   chatList() {
     return StreamBuilder(
-        stream: chats,
+        stream: privateChats,
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.hasError) {
             showSnackBar(
@@ -108,16 +117,49 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (snapshot.hasData) {
             if (snapshot.data['privateChats'] != null) {
               if (snapshot.data['privateChats'].length != 0) {
+                return StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('p2pChat')
+                        .where('combinedId', arrayContains: FirebaseAuth.instance.currentUser!.uid)
+                        .snapshots(),
+                    builder: (context, snapOne) {
+                      if (snapOne.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: Constants.mainColor,
+                          ),
+                        );
+                      } else if (snapOne.hasData) {
+                        return ListView.builder(
+                            itemCount: snapOne.data?.docs.length,
+                            itemBuilder: (context, indexOne) {
+                              dynamic peerNames =
+                                  snapOne.data?.docs[indexOne]['members'];
+                              dynamic peerName = peerNames
+                                  .where((element) =>
+                                      element['id'] !=
+                                      FirebaseAuth.instance.currentUser!.uid)
+                                  .toList();
+                              peerName = peerName[0]['name'];
+                              if (userInfo != null) {
+                                return ChatTile(
+                                    peerName: peerName,
+                                    chatId: snapOne.data?.docs[indexOne]
+                                        ['chatId'],
+                                    recentMessage:snapOne.data?.docs[indexOne]
+                                    ['recentMessage']);
+                              } else {}
+                            });
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: Constants.mainColor,
+                          ),
+                        );
+                      }
+                    });
 
                 // show actual data
-                return ListView.builder(
-                    itemCount: snapshot.data['privateChats'].length,
-                    itemBuilder: (context, index) {
-                      return ChatTile(
-                          peerName: 'peerName',
-                          chatId: snapshot.data['privateChats'][index],
-                          recentMessage: 'recentMessage');
-                    });
               } else {
                 // return no private chats
                 return Center(

@@ -39,7 +39,16 @@ class DatabaseService {
     return userCollection.doc(uid).snapshots();
   }
 
-  Future createChat(String peerOneId, String peerTwoId) async {
+  getP2pChats() async {
+    return p2pCollection.snapshots();
+  }
+
+  getUsers() async {
+    return userCollection.snapshots();
+  }
+
+  Future createChat(String peerOneId, String peerTwoId, String peerOneName,
+      String peerTwoName) async {
     List<dynamic> chatIds = [];
     bool? peerToPeerAlready;
 
@@ -60,18 +69,23 @@ class DatabaseService {
 
     if (peerOneChats.isEmpty) {
       DocumentReference chatDocumentReference = await p2pCollection.add({
-        "members": [],
+        "members": {},
         "recentMessage": "",
         "chatId": "",
         "recentMessageSender": "",
         "messages": [],
-        "lastUpdated": ""
+        "lastUpdated": "",
+        "combinedId": []
       });
 
       await chatDocumentReference.update({
         "chatId": chatDocumentReference.id,
-        "members": FieldValue.arrayUnion([peerOneId, peerTwoId]),
-        "lastUpdated": Timestamp.now().toString()
+        "members": {
+          {'name': peerOneName, 'id': peerOneId},
+          {'name': peerTwoName, 'id': peerTwoId}
+        },
+        "lastUpdated": Timestamp.now().toString(),
+        "combinedId": FieldValue.arrayUnion([peerOneId, peerTwoId])
       });
 
       await peerOneDocumentReference.update({
@@ -97,18 +111,23 @@ class DatabaseService {
       }
       if (peerToPeerAlready == false) {
         DocumentReference chatDocumentReference = await p2pCollection.add({
-          "members": [],
+          "members": {},
           "recentMessage": "",
           "chatId": "",
           "recentMessageSender": "",
           "messages": [],
-          "lastUpdated": ""
+          "lastUpdated": "",
+          "combinedId": [],
         });
 
         await chatDocumentReference.update({
           "chatId": chatDocumentReference.id,
-          "members": FieldValue.arrayUnion([peerOneId, peerTwoId]),
-          "lastUpdated": Timestamp.now().toString()
+          "members": {
+            {'name': peerOneName, 'id': peerOneId},
+            {'name': peerTwoName, 'id': peerTwoId}
+          },
+          "lastUpdated": Timestamp.now().toString(),
+          "combinedId": FieldValue.arrayUnion([peerOneId, peerTwoId])
         });
 
         await peerOneDocumentReference.update({
@@ -185,6 +204,5 @@ class DatabaseService {
       "recentMessageSender": message['sender'],
       "recentMessageTime": message['time'].toString()
     });
-
   }
 }
