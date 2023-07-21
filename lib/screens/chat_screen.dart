@@ -5,6 +5,7 @@ import 'package:chat_application/widgets/customTextFieldThree.dart';
 import 'package:chat_application/widgets/customTextFieldTwo.dart';
 import 'package:chat_application/widgets/messageTile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +27,7 @@ class _ChatScreenState extends State<ChatScreen> {
   TextEditingController textEditingController = TextEditingController();
 
   getChat() {
-    DatabaseService().getChat('chatId').then((value) {
+    DatabaseService().getChat(widget.chatId).then((value) {
       setState(() {
         chats = value;
       });
@@ -118,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (textEditingController.text.isNotEmpty) {
       Map<String, dynamic> chatMessage = {
         "message": textEditingController.text,
-        "sender": widget.userName,
+        "senderId": FirebaseAuth.instance.currentUser!.uid,
         "chatId": widget.chatId,
         "time": DateTime.now().microsecondsSinceEpoch
       };
@@ -141,9 +142,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     return MessageTile(
                         message: snapshot.data.docs[index]['message'],
-                        sender: snapshot.data.docs[index]['sender'],
-                        isSentByMe: widget.userName ==
-                            snapshot.data.docs[index]['sender']);
+                        senderId: snapshot.data.docs[index]['senderId'],
+                        isSentByMe: FirebaseAuth.instance.currentUser!.uid ==
+                            snapshot.data.docs[index]['senderId']);
                   },
                 )
               : Container(

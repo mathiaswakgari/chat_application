@@ -105,10 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder(
         stream: privateChats,
         builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.hasError) {
-            showSnackBar(
-                context, Constants.secondaryColor, snapshot.error.toString());
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
+           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(
                 color: Constants.mainColor,
