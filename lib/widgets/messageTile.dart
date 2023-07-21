@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class MessageTile extends StatefulWidget {
-  const MessageTile({Key? key}) : super(key: key);
+
+  final String message;
+  final String sender;
+  final bool isSentByMe;
+  const MessageTile({Key? key, required this.message, required this.sender, required this.isSentByMe}) : super(key: key);
 
   @override
   State<MessageTile> createState() => _MessageTileState();

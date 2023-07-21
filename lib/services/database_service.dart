@@ -183,6 +183,7 @@ class DatabaseService {
     p2pCollection.doc(chatId).update({
       "recentMessage": message['message'],
       "recentMessageSender": message['sender'],
+      "recentMessageTime": message['time'].toString()
     });
 
   }

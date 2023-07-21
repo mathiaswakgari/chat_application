@@ -64,9 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context)=> const SearchScreen())
-                );
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const SearchScreen()));
               },
               child: const Icon(CupertinoIcons.search),
             ),
@@ -109,11 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (snapshot.hasData) {
             if (snapshot.data['privateChats'] != null) {
               if (snapshot.data['privateChats'].length != 0) {
+
                 // show actual data
                 return ListView.builder(
                     itemCount: snapshot.data['privateChats'].length,
                     itemBuilder: (context, index) {
-                      return  ;
+                      return ChatTile(
+                          peerName: 'peerName',
+                          chatId: snapshot.data['privateChats'][index],
+                          recentMessage: 'recentMessage');
                     });
               } else {
                 // return no private chats

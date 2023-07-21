@@ -3,20 +3,18 @@ import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customStyle.dart';
 import 'package:chat_application/widgets/customTextFieldThree.dart';
 import 'package:chat_application/widgets/customTextFieldTwo.dart';
+import 'package:chat_application/widgets/messageTile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
   final String userName;
-  final String uid;
+  final String? uid;
   final String chatId;
 
   const ChatScreen(
-      {Key? key,
-      required this.userName,
-      required this.uid,
-      required this.chatId})
+      {Key? key, required this.userName, this.uid, required this.chatId})
       : super(key: key);
 
   @override
@@ -24,13 +22,13 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  Stream<QuerySnapshot>? chat;
+  Stream<QuerySnapshot>? chats;
   TextEditingController textEditingController = TextEditingController();
 
   getChat() {
     DatabaseService().getChat('chatId').then((value) {
       setState(() {
-        chat = value;
+        chats = value;
       });
     });
   }
@@ -55,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         backgroundColor: Constants.mainColor,
         title: Text(
-          "Hannah",
+          widget.userName,
           style: customTextStyle(20, Colors.white, FontWeight.bold),
         ),
         actions: const [
@@ -69,15 +67,10 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
         elevation: 0,
         toolbarHeight: 65,
-        leading: const Padding(
-          padding: EdgeInsets.only(left: 8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.grey,
-          ),
-        ),
       ),
       body: Stack(
         children: [
+          chatMessage(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             alignment: Alignment.bottomCenter,
@@ -86,18 +79,17 @@ class _ChatScreenState extends State<ChatScreen> {
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.symmetric(vertical: 5),
               decoration: BoxDecoration(
-                color: Constants.mainColor,
-                borderRadius: BorderRadius.circular(0)
-              ),
+                  color: Constants.mainColor,
+                  borderRadius: BorderRadius.circular(0)),
               child: Row(
                 children: [
                   Expanded(
                     child: CustomTextFieldThree(
-                        textEditingController: textEditingController,
-                        ),
+                      textEditingController: textEditingController,
+                    ),
                   ),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: sendMessage,
                     child: Container(
                       margin: const EdgeInsets.only(right: 10),
                       height: 30,
@@ -106,7 +98,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Center(child: Icon(Icons.send, color: Constants.mainColor,)),
+                      child: Center(
+                          child: Icon(
+                        Icons.send,
+                        color: Constants.mainColor,
+                      )),
                     ),
                   )
                 ],
@@ -118,10 +114,46 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  sendMessage(){
+  sendMessage() {
+    if (textEditingController.text.isNotEmpty) {
+      Map<String, dynamic> chatMessage = {
+        "message": textEditingController.text,
+        "sender": widget.userName,
+        "chatId": widget.chatId,
+        "time": DateTime.now().microsecondsSinceEpoch
+      };
 
+      DatabaseService().sendMessage(widget.chatId, chatMessage);
+
+      setState(() {
+        textEditingController.clear();
+      });
+    }
   }
-  charMessage(){
-     
+
+  chatMessage() {
+    return StreamBuilder(
+        stream: chats,
+        builder: (context, AsyncSnapshot snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  itemCount: snapshot.data.docs.length,
+                  itemBuilder: (context, index) {
+                    return MessageTile(
+                        message: snapshot.data.docs[index]['message'],
+                        sender: snapshot.data.docs[index]['sender'],
+                        isSentByMe: widget.userName ==
+                            snapshot.data.docs[index]['sender']);
+                  },
+                )
+              : Container(
+            child: Center(
+              child: Text(
+                "No Messages",
+                style: customTextStyle(25, Colors.black, FontWeight.normal),
+              ),
+            ),
+          );
+        });
   }
 }
