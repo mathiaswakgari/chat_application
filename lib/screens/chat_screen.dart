@@ -93,8 +93,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     onTap: sendMessage,
                     child: Container(
                       margin: const EdgeInsets.only(right: 10),
-                      height: 30,
-                      width: 30,
+                      height: 40,
+                      width: 40,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(50),
@@ -140,12 +140,9 @@ class _ChatScreenState extends State<ChatScreen> {
               ? ListView.builder(
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
-
-
                     List dataList =
                         snapshot.data.docs.map((e) => e.data()).toList();
-                     dataList.sort((a, b) =>
-                        a['time'].compareTo(b['time']));
+                    dataList.sort((a, b) => a['time'].compareTo(b['time']));
 
                     /*print(dataList[index]['time']);*/
 

@@ -90,7 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: CustomDrawer(fullName: fullName!, email: email!, index: 1),
       body: chatList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const SearchScreen()));
+        },
         backgroundColor: Constants.mainColor,
         elevation: 0,
         child: const Icon(
@@ -105,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder(
         stream: privateChats,
         builder: (context, AsyncSnapshot snapshot) {
-           if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
               child: CircularProgressIndicator(
                 color: Constants.mainColor,
@@ -117,7 +120,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 return StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('p2pChat')
-                        .where('combinedId', arrayContains: FirebaseAuth.instance.currentUser!.uid)
+                        .where('combinedId',
+                            arrayContains:
+                                FirebaseAuth.instance.currentUser!.uid)
                         .snapshots(),
                     builder: (context, snapOne) {
                       if (snapOne.connectionState == ConnectionState.waiting) {
@@ -143,8 +148,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     peerName: peerName,
                                     chatId: snapOne.data?.docs[indexOne]
                                         ['chatId'],
-                                    recentMessage:snapOne.data?.docs[indexOne]
-                                    ['recentMessage']);
+                                    recentMessage: snapOne.data?.docs[indexOne]
+                                        ['recentMessage']);
                               } else {}
                             });
                       } else {

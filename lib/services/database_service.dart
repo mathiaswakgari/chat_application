@@ -155,7 +155,7 @@ class DatabaseService {
   }
 
   searchUsers(String name) async {
-    return userCollection.where("fullName", isLessThanOrEqualTo: name).get();
+    return userCollection.where("fullName", isEqualTo: name).get();
   }
 
   Future<bool> isChatStarted(String peerOneId, String peerTwoId) async {

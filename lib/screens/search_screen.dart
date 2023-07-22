@@ -59,7 +59,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: TextField(
                     controller: searchController,
                     decoration: InputDecoration(
-                        hintText: "Search users...",
+                        hintText: "Whom to message...",
                         hintStyle: customTextStyle(
                             15, Colors.white, FontWeight.normal),
                         border: InputBorder.none),
@@ -113,26 +113,16 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  /*hasStartedChatAlready(String chatId, String userId) async {
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-        .isChatStarted(userId)
-        .then((value) {
-      setState(() {
-        _hasChatAlready = value;
-      });
-    });
-  }*/
-
   usersList() {
     return _hasSearched
         ? ListView.builder(
             shrinkWrap: true,
-            itemCount: querySnapshot!.docs.length,
+            itemCount: querySnapshot!.docs.where((element) => element['uid'] != FirebaseAuth.instance.currentUser!.uid).length,
             itemBuilder: (context, index) {
               return SearchTile(
-                  userName: querySnapshot!.docs[index].get('fullName'),
-                  uid : querySnapshot!.docs[index].get('uid'),
-             );
+                userName: querySnapshot!.docs[index].get('fullName'),
+                uid: querySnapshot!.docs[index].get('uid'),
+              );
             })
         : Container();
   }
