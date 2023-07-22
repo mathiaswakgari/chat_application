@@ -41,14 +41,6 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: Column(
         children: [
-          // Container(
-          //   color: Constants.mainColor,
-          //   decoration: BoxDecoration(
-          //
-          //   ),
-          //   width: MediaQuery.of(context).size.width,
-          //   child: Text("To", style: customTextStyle(13, Colors.white, FontWeight.bold),),
-          // ),
           Container(
             color: Constants.mainColor,
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
@@ -117,7 +109,10 @@ class _SearchScreenState extends State<SearchScreen> {
     return _hasSearched
         ? ListView.builder(
             shrinkWrap: true,
-            itemCount: querySnapshot!.docs.where((element) => element['uid'] != FirebaseAuth.instance.currentUser!.uid).length,
+            itemCount: querySnapshot!.docs
+                .where((element) =>
+                    element['uid'] != FirebaseAuth.instance.currentUser!.uid)
+                .length,
             itemBuilder: (context, index) {
               return SearchTile(
                 userName: querySnapshot!.docs[index].get('fullName'),

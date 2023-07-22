@@ -1,3 +1,5 @@
+import 'package:chat_application/screens/chat_screen.dart';
+import 'package:chat_application/screens/home_screen.dart';
 import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/widgets/customButton.dart';
 import 'package:chat_application/widgets/snackBar.dart';
@@ -64,11 +66,12 @@ class _SearchTileState extends State<SearchTile> {
                   "Chat is Already Available");
             } else {
               await DatabaseService().createChat(
-                  FirebaseAuth.instance.currentUser!.uid, widget.uid, userInfo?.docs[0]['fullName'],widget.userName);
-              setState(() {});
-              showSnackBar(context, Constants.mainColor,
-                  "Chat created succesfully");
+                  FirebaseAuth.instance.currentUser!.uid, widget.uid, userInfo?.docs[0]['fullName'],widget.userName).then((value){
+                    setState(() {
+                    });
+              });
             }
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const HomeScreen()));
           },
           label: _isChatAvailable ? "Send" : "Start"),
     );
