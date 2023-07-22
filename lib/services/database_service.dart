@@ -150,7 +150,7 @@ class DatabaseService {
     return p2pCollection
         .doc(chatId)
         .collection('messages')
-        .orderBy('time')
+        .orderBy('time', descending: true)
         .snapshots();
   }
 
