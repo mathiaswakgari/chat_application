@@ -121,7 +121,7 @@ class _ChatScreenState extends State<ChatScreen> {
         "message": textEditingController.text,
         "senderId": FirebaseAuth.instance.currentUser!.uid,
         "chatId": widget.chatId,
-        "time": Timestamp.now()
+        "time": DateTime.now().microsecondsSinceEpoch
       };
 
       DatabaseService().sendMessage(widget.chatId, chatMessage);
@@ -141,25 +141,31 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
 
-                    print(snapshot.data.docs[index]['message']);
+
+                    List dataList =
+                        snapshot.data.docs.map((e) => e.data()).toList();
+                     dataList.sort((a, b) =>
+                        a['time'].compareTo(b['time']));
+
+                    /*print(dataList[index]['time']);*/
 
                     return MessageTile(
-                        message: snapshot.data.docs[index]['message'],
-                        senderId: snapshot.data.docs[index]['senderId'],
+                        message: dataList[index]['message'],
+                        senderId: dataList[index]['senderId'],
                         isSentByMe: FirebaseAuth.instance.currentUser!.uid ==
                             snapshot.data.docs[index]['senderId'],
-                        userNameInitial: widget.userName.substring(0, 1)
-                    );
+                        userNameInitial: widget.userName.substring(0, 1));
                   },
                 )
               : Container(
-            child: Center(
-              child: Text(
-                "No Messages",
-                style: customTextStyle(25, Colors.black, FontWeight.normal),
-              ),
-            ),
-          );
+                  child: Center(
+                    child: Text(
+                      "No Messages",
+                      style:
+                          customTextStyle(25, Colors.black, FontWeight.normal),
+                    ),
+                  ),
+                );
         });
   }
 }
