@@ -1,4 +1,4 @@
-# online_chat_application
+# online_chat_application(ChatNova)
 
 A real-time chat application built using flutter and firebase. Contains validation and authentication. 
 Serach and find anyone. Message anyone with texts only. Input validation is included. Simple UI design.
