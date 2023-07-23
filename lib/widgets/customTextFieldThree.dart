@@ -13,6 +13,7 @@ class CustomTextFieldThree extends StatelessWidget {
       constraints: const BoxConstraints(maxHeight: 55.0),
       child: TextFormField(
         controller: textEditingController,
+
         validator: (value) {
           if (value!.length < 0) {
             return "Enter a message to send.";
@@ -26,6 +27,7 @@ class CustomTextFieldThree extends StatelessWidget {
           hintText: "Message...",
           hintStyle: customTextStyle(16, Colors.white, FontWeight.w500),
         ),
+        style: customTextStyle(15, Colors.white, FontWeight.normal),
         maxLines: null,
       ),
     );

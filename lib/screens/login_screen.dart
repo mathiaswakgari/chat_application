@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../helper/functions.dart';
 import '../services/auth_service.dart';
@@ -117,9 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onPressed: () {
                                     Navigator.push(
                                         context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const SignupScreen()));
+                                        PageTransition(
+                                            child: const SignupScreen(),
+                                            type: PageTransitionType
+                                                .rightToLeft));
                                   },
                                   style: TextButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(
@@ -159,8 +161,11 @@ class _LoginScreenState extends State<LoginScreen> {
           await HelperFunctions.saveUserEmail(emailTextEditingController.text);
           await HelperFunctions.saveUserName(querySnapshot.docs[0]['fullName']);
 
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()));
+          Navigator.pushReplacement(
+              context,
+              PageTransition(
+                  child: const HomeScreen(),
+                  type: PageTransitionType.leftToRight));
         } else {
           showSnackBar(context, const Color(0xFFE77200), value);
           setState(() {
