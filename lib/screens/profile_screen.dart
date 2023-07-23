@@ -1,3 +1,5 @@
+import 'package:chat_application/helper/functions.dart';
+import 'package:chat_application/screens/home_screen.dart';
 import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customButton.dart';
@@ -91,7 +93,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       isEnabled: true,
                     ),
                     const CustomSpacing(),
-                    CustomButton(onPressed: update, label: "Update")
+                    _isUpdating
+                        ? CircularProgressIndicator(
+                            color: Constants.mainColor,
+                          )
+                        : CustomButton(onPressed: update, label: "Update")
                   ],
                 ),
               ),
@@ -108,15 +114,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _isUpdating = true;
       });
       await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
-          .updateUser(fullNameController.text, passwordController.text).then((value){
-            if(value == true){
-              showSnackBar(context, Constants.mainColor, "Update successful.");
-              // update sharedPreference
-              Navigator.pop(context);
-            }
-            else{
-            showSnackBar(context, Constants.secondaryColor, value);
+          .updateUser(fullNameController.text, passwordController.text)
+          .then((value) {
+        if (value.isNotEmpty) {
+          showSnackBar(context, Constants.mainColor, "Update successful.");
+          HelperFunctions.saveUserName(value);
+          // update sharedPreference
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => const HomeScreen()));
+        } else {
+          showSnackBar(context, Constants.secondaryColor, value);
         }
+      });
+      setState(() {
+        _isUpdating = false;
       });
     }
   }

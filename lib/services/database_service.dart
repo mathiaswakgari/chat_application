@@ -24,12 +24,11 @@ class DatabaseService {
 
   Future updateUser(String fullName, String password) async {
     try {
-      print(uid);
       await userCollection.doc(uid).update({
         "fullName": fullName,
       });
       await FirebaseAuth.instance.currentUser!.updatePassword(password);
-      return true;
+      return fullName;
     } on FirebaseAuthException catch (error) {
       return error.message;
     }
