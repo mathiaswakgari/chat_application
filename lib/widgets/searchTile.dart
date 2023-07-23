@@ -1,4 +1,3 @@
-import 'package:chat_application/screens/chat_screen.dart';
 import 'package:chat_application/screens/home_screen.dart';
 import 'package:chat_application/services/database_service.dart';
 import 'package:chat_application/widgets/customButton.dart';
@@ -7,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../shared/constants.dart';
 import 'customStyle.dart';
@@ -14,7 +14,6 @@ import 'customStyle.dart';
 class SearchTile extends StatefulWidget {
   final String userName;
   final String uid;
-
 
   const SearchTile({Key? key, required this.userName, required this.uid})
       : super(key: key);
@@ -27,8 +26,10 @@ class _SearchTileState extends State<SearchTile> {
   bool _isChatAvailable = false;
   QuerySnapshot? userInfo;
 
-  getUserInfo()async{
-    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid).getUser().then((value){
+  getUserInfo() async {
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUser()
+        .then((value) {
       setState(() {
         userInfo = value;
       });
@@ -65,13 +66,19 @@ class _SearchTileState extends State<SearchTile> {
               showSnackBar(context, Constants.secondaryColor,
                   "Chat is Already Available");
             } else {
-              await DatabaseService().createChat(
-                  FirebaseAuth.instance.currentUser!.uid, widget.uid, userInfo?.docs[0]['fullName'],widget.userName).then((value){
-                    setState(() {
-                    });
+              await DatabaseService()
+                  .createChat(
+                      FirebaseAuth.instance.currentUser!.uid,
+                      widget.uid,
+                      userInfo?.docs[0]['fullName'],
+                      widget.userName)
+                  .then((value) {
+                setState(() {});
               });
             }
-            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=> const HomeScreen()));
+            Navigator.of(context).pushReplacement(PageTransition(
+                child: const HomeScreen(),
+                type: PageTransitionType.bottomToTop));
           },
           label: _isChatAvailable ? "Send" : "Start"),
     );

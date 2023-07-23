@@ -144,8 +144,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         snapshot.data.docs.map((e) => e.data()).toList();
                     dataList.sort((a, b) => a['time'].compareTo(b['time']));
 
-                    /*print(dataList[index]['time']);*/
-
                     return MessageTile(
                         message: dataList[index]['message'],
                         senderId: dataList[index]['senderId'],
@@ -154,15 +152,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         userNameInitial: widget.userName.substring(0, 1));
                   },
                 )
-              : Container(
-                  child: Center(
-                    child: Text(
-                      "No Messages",
-                      style:
-                          customTextStyle(25, Colors.black, FontWeight.normal),
-                    ),
-                  ),
-                );
+              : Container();
         });
   }
 }

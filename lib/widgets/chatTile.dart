@@ -3,9 +3,11 @@ import 'package:chat_application/shared/constants.dart';
 import 'package:chat_application/widgets/customStyle.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 class ChatTile extends StatefulWidget {
   final String peerName;
+  final String peerNameInitial;
   final String chatId;
   final String recentMessage;
 
@@ -13,7 +15,8 @@ class ChatTile extends StatefulWidget {
       {Key? key,
       required this.peerName,
       required this.chatId,
-      required this.recentMessage})
+      required this.recentMessage,
+      required this.peerNameInitial})
       : super(key: key);
 
   @override
@@ -26,9 +29,9 @@ class _ChatTileState extends State<ChatTile> {
     //or return list tile
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) =>
-                ChatScreen(userName: widget.peerName, chatId: widget.chatId)));
+        Navigator.of(context).push(PageTransition(
+            child: ChatScreen(userName: widget.peerName, chatId: widget.chatId),
+            type: PageTransitionType.rightToLeft));
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -42,8 +45,12 @@ class _ChatTileState extends State<ChatTile> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
-                child: const CircleAvatar(
+                child: CircleAvatar(
               backgroundColor: Colors.grey,
+              child: Text(
+                widget.peerNameInitial,
+                style: customTextStyle(20, Colors.white, FontWeight.normal),
+              ),
             )),
             const SizedBox(
               width: 10,

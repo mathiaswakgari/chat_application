@@ -30,7 +30,7 @@ class _MessageTileState extends State<MessageTile> {
           ? EdgeInsets.only(
               right: MediaQuery.of(context).size.width * 0.2, left: 20, top: 20)
           : EdgeInsets.only(
-              left:  MediaQuery.of(context).size.width * 0.2,
+              left: MediaQuery.of(context).size.width * 0.2,
               right: 20,
               top: 20),
       decoration: BoxDecoration(
@@ -47,7 +47,11 @@ class _MessageTileState extends State<MessageTile> {
                     backgroundColor: Colors.grey,
                     foregroundColor: Colors.white,
                     radius: 12,
-                    child: Text(widget.userNameInitial),
+                    child: Text(
+                      widget.userNameInitial,
+                      style:
+                          customTextStyle(15, Colors.white, FontWeight.normal),
+                    ),
                   ),
                 ),
                 Expanded(

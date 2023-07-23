@@ -13,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import 'login_screen.dart';
 
@@ -73,8 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(right: 12.0),
             child: GestureDetector(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const SearchScreen()));
+                Navigator.of(context).push(PageTransition(
+                    child: const SearchScreen(),
+                    type: PageTransitionType.bottomToTop));
               },
               child: const Icon(CupertinoIcons.search),
             ),
@@ -91,8 +93,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: chatList(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SearchScreen()));
+          Navigator.of(context).push(PageTransition(
+              child: const SearchScreen(),
+              type: PageTransitionType.bottomToTop));
         },
         backgroundColor: Constants.mainColor,
         elevation: 0,
@@ -146,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               if (userInfo != null) {
                                 return ChatTile(
                                     peerName: peerName,
+                                    peerNameInitial: peerName.substring(0, 1),
                                     chatId: snapOne.data?.docs[indexOne]
                                         ['chatId'],
                                     recentMessage: snapOne.data?.docs[indexOne]

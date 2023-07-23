@@ -1,6 +1,7 @@
 import 'package:chat_application/screens/home_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../screens/login_screen.dart';
 import '../screens/profile_screen.dart';
@@ -50,8 +51,9 @@ class CustomDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
+                    PageTransition(
+                        child: const HomeScreen(),
+                        type: PageTransitionType.rightToLeft));
               }
             },
             selectedColor: Constants.secondaryColor,
@@ -72,11 +74,9 @@ class CustomDrawer extends StatelessWidget {
               } else {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => ProfileScreen(
-                              fullName: fullName,
-                              email: email,
-                            )));
+                    PageTransition(
+                        child: ProfileScreen(fullName: fullName, email: email),
+                        type: PageTransitionType.rightToLeft));
               }
             },
             selectedColor: Constants.secondaryColor,
