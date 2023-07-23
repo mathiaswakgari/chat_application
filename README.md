@@ -3,7 +3,7 @@
 A real-time chat application built using flutter and firebase. Contains validation and authentication. 
 Serach and find anyone. Message anyone with texts only. Input validation is included. Simple UI design.
 
-##ScreenShots
+## ScreenShots
 
 
 ![sign_in](https://github.com/mathiaswakgari/chat_application/assets/104831041/42ad66a6-820c-48cd-81d6-ea454c6dfa8d)
